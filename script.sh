@@ -5,6 +5,7 @@ set -euo pipefail
 OLD_PREFIXES=(
 	"https://raw.githubusercontent.com/jenkinsci/attachments-from-jira-issues-misc/refs/heads/main/attachments"
 	"https://raw.githubusercontent.com/jenkinsci/attachments-from-jira-issues-last/refs/heads/main/attachments"
+    "https://raw.githubusercontent.com/jenkinsci/attachments-from-jira-issues-core-cli/refs/heads/main/attachments"
 )
 NEW_PREFIX="https://issues.jenkins.io/secure/attachment"
 TARGET_LABEL="imported-jira-issue"
