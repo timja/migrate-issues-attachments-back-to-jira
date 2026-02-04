@@ -107,11 +107,11 @@ repos=()
 if [[ -n "$specific_repo" ]]; then
   repos+=("$specific_repo")
 else
-  repo_json=$(gh repo list "$ORG" --limit "$LIMIT" --json nameWithOwner,issuesEnabled,isArchived) || {
+  repo_json=$(gh repo list "$ORG" --limit "$LIMIT" --json nameWithOwner,hasIssuesEnabled,isArchived) || {
     log "ERROR: Failed to list repositories for org $ORG"
     exit 1
   }
-  mapfile -t repos < <(printf '%s' "$repo_json" | jq -r '.[] | select((.issuesEnabled // false) == true and (.isArchived // false) == false) | .nameWithOwner')
+  mapfile -t repos < <(printf '%s' "$repo_json" | jq -r '.[] | select((.hasIssuesEnabled // false) == true and (.isArchived // false) == false) | .nameWithOwner')
 
   if [[ -n "$MATCH_PATTERN" ]]; then
     filtered=()
