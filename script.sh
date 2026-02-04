@@ -142,6 +142,7 @@ skipped_count=0
 error_count=0
 
 for issue_number in "${issue_numbers[@]}"; do
+	issue_url="https://github.com/$repo/issues/$issue_number"
 	log "Inspecting issue #$issue_number"
 	issue_json=""
 	if ! run_with_retry issue_json gh api "repos/$repo/issues/$issue_number"; then
@@ -170,7 +171,7 @@ for issue_number in "${issue_numbers[@]}"; do
 	fi
 
 	if $dry_run; then
-		log "[dry-run] Would update issue #$issue_number"
+		log "[dry-run] Would update $issue_url"
 		((updated_count+=1))
 		continue
 	fi
@@ -178,10 +179,10 @@ for issue_number in "${issue_numbers[@]}"; do
 	tmpfile=$(mktemp)
 	printf '%s' "$updated_body" > "$tmpfile"
 	if run_with_retry "" gh issue edit -R "$repo" "$issue_number" --body-file "$tmpfile"; then
-		log "Updated issue #$issue_number"
+		log "Updated $issue_url"
 		((updated_count+=1))
 	else
-		log "Failed to update issue #$issue_number"
+		log "Failed to update $issue_url"
 		((error_count+=1))
 	fi
 	rm -f "$tmpfile"
