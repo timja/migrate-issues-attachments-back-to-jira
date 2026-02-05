@@ -145,26 +145,29 @@ if [[ -n "$child_max_backoff" ]]; then
   child_args+=("--max-backoff" "$child_max_backoff")
 fi
 
-success_count=0
-failure_count=0
+failed_repos=()
 
 child_cmd=("bash" "$SINGLE_REPO_SCRIPT")
 for repo in "${repos[@]}"; do
   log "Running script.sh for $repo"
-  if "${child_cmd[@]}" --repo "$repo" "${child_args[@]}"; then
-    ((success_count+=1))
-  else
-    log "script.sh failed for $repo"
-    ((failure_count+=1))
+  if ! "${child_cmd[@]}" --repo "$repo" "${child_args[@]}"; then
+    log "script.sh reported failures for $repo"
+    failed_repos+=("$repo")
   fi
   # Brief pause to avoid hammering the API from orchestrator itself
   sleep 1
 done
 
-log "Completed run: success=$success_count failure=$failure_count"
+log "Completed run for ${#repos[@]} repositories"
 
-if (( failure_count > 0 )); then
+if (( ${#failed_repos[@]} > 0 )); then
+  log "Repositories with failures:"
+  for failed_repo in "${failed_repos[@]}"; do
+    log "  - $failed_repo"
+  done
   exit 1
 fi
+
+log "All repositories completed without failures"
 
 exit 0

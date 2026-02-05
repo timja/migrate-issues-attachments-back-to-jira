@@ -140,13 +140,16 @@ log "Found ${#issue_numbers[@]} labeled issues in $repo"
 updated_count=0
 skipped_count=0
 error_count=0
+failed_issue_messages=()
 
 for issue_number in "${issue_numbers[@]}"; do
 	issue_url="https://github.com/$repo/issues/$issue_number"
 	log "Inspecting issue #$issue_number"
 	issue_json=""
 	if ! run_with_retry issue_json gh api "repos/$repo/issues/$issue_number"; then
-		log "Failed to fetch issue #$issue_number"
+		failure_message="Failed to fetch $issue_url"
+		log "$failure_message"
+		failed_issue_messages+=("$failure_message")
 		((error_count+=1))
 		continue
 	fi
@@ -182,17 +185,23 @@ for issue_number in "${issue_numbers[@]}"; do
 		log "Updated $issue_url"
 		((updated_count+=1))
 	else
-		log "Failed to update $issue_url"
+		failure_message="Failed to update $issue_url"
+		log "$failure_message"
+		failed_issue_messages+=("$failure_message")
 		((error_count+=1))
 	fi
 	rm -f "$tmpfile"
 done
 
 log "Completed repository $repo"
-log "Updated: $updated_count | Skipped: $skipped_count | Errors: $error_count"
-
 if (( error_count > 0 )); then
+	log "Issues with failures in $repo:"
+	for failure in "${failed_issue_messages[@]}"; do
+		log "  - $failure"
+	done
 	exit 1
 fi
+
+log "No issues failed in $repo (updated $updated_count issues)"
 
 exit 0
