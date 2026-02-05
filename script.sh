@@ -12,9 +12,9 @@ TARGET_LABEL="imported-jira-issue"
 
 repo=""
 dry_run=false
-max_retries=5
-initial_backoff=2
-max_backoff=60
+max_retries=100
+initial_backoff=10
+max_backoff=20000
 
 usage() {
 	cat <<'USAGE'
@@ -25,9 +25,9 @@ Updates issue descriptions that contain legacy attachment URLs for the given rep
 Options:
 	--repo              Repository in owner/name form (required)
 	--dry-run           Show planned updates without editing issues
-	--max-retries       Number of retry attempts for GitHub API calls (default: 5)
-	--initial-backoff   Initial backoff delay in seconds (default: 2)
-	--max-backoff       Maximum backoff delay in seconds (default: 60)
+	--max-retries       Number of retry attempts for GitHub API calls (default: 100)
+	--initial-backoff   Initial backoff delay in seconds (default: 10)
+	--max-backoff       Maximum backoff delay in seconds (default: 20000)
 	-h, --help          Show this help message
 USAGE
 }
